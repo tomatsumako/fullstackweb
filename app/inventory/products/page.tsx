@@ -19,10 +19,26 @@ export default function Page() {
     setData(productsData);
   }, [])
 
+  // 新規登録処理、新規登録行の表示状態を保持
+  const [shownNewRow, setShownNewRow] = useState(false);
+  const handleShownNewRow = (event: React.MouseEvent<HTMLElement>) => {
+    event.preventDefault();
+    setShownNewRow(true)
+  };
+  const handleAddCancel = (event: React.MouseEvent<HTMLElement>) => {
+    event.preventDefault();
+    setShownNewRow(false)
+  };
+  const handleAdd = (event: React.MouseEvent<HTMLElement>) => {
+    event.preventDefault();
+    // バックエンドを使用した登録処理を呼ぶ
+    setShownNewRow(false)
+  };
+
   return (
     <>
       <h2>商品一覧</h2>
-      <button>商品を追加する</button>
+      <button onClick={ handleShownNewRow }>商品を追加する</button>
       <table>
         <thead>
           <tr>
@@ -35,18 +51,28 @@ export default function Page() {
           </tr>
         </thead>
         <tbody>
-            {data.map((data: any) => (
-                <tr key={data.id}>
-                    <td>{data.id}</td>
-                    <td>{data.name}</td>
-                    <td>{data.price}</td>
-                    <td>{data.description}</td>
-                    <td><Link href={`/inventory/products/${data.id}`}>在庫処理</Link></td>
-                    <td>
-                        <button>更新・削除</button>
-                    </td>
-                </tr>
-            ))}
+          {shownNewRow ? (
+            <tr>
+              <td></td>
+              <td><input type="text" /></td>
+              <td><input type="number" /></td>
+              <td><input type="text" /></td>
+              <td></td>
+              <td><button onClick={handleAddCancel}>キャンセル</button><button onClick={handleAdd}>登録する</button></td>
+            </tr>
+          ) : ""}
+          {data.map((data: any) => (
+            <tr key={data.id}>
+              <td>{data.id}</td>
+              <td>{data.name}</td>
+              <td>{data.price}</td>
+              <td>{data.description}</td>
+              <td><Link href={`/inventory/products/${data.id}`}>在庫処理</Link></td>
+              <td>
+                <button>更新・削除</button>
+              </td>
+            </tr>
+          ))}
         </tbody>
       </table>
     </>
