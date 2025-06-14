@@ -3,12 +3,20 @@
 import { useState, useEffect } from "react";
 import productsData from "./sample/dummy_products.json";
 import Link from "next/link";
+import { useSelectedLayoutSegment } from "next/navigation";
 
 type ProductData = {
     id: number | null;
     name: string;
     price: number;
     description: string;
+};
+
+type InputData = {
+  id: string;
+  name: string;
+  price: string;
+  description: string;
 };
 
 export default function Page() {
@@ -18,6 +26,20 @@ export default function Page() {
   useEffect(() => {
     setData(productsData);
   }, [])
+
+  // 登録データを保持
+  const [input, setInput] = useState<InputData>({
+    id: "",
+    name: "",
+    price: "",
+    description: ""
+  });
+
+  // 登録データの値を更新
+  const handleInput = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { value, name } = event.target;
+    setInput({ ...input, [name]: value });
+  }
 
   // 新規登録処理、新規登録行の表示状態を保持
   const [shownNewRow, setShownNewRow] = useState(false);
@@ -40,6 +62,13 @@ export default function Page() {
   const handleEditRow: any = (id: number) => {
     setShownNewRow(false)
     setEditingRow(id)
+    const selectedProduct: ProductData = data.find((v) => v.id === id) as ProductData;
+    setInput({
+      id: id.toString(),
+      name: selectedProduct.name,
+      price: selectedProduct.price.toString(),
+      description: selectedProduct.description,
+    })
   };
   const handleEditCancel: any = (id: number) => {
     setEditingRow(0)
@@ -70,9 +99,9 @@ export default function Page() {
           {shownNewRow ? (
             <tr>
               <td></td>
-              <td><input type="text" /></td>
-              <td><input type="number" /></td>
-              <td><input type="text" /></td>
+              <td><input type="text" name="name" onChange={handleInput} /></td>
+              <td><input type="number" name="price" onChange={handleInput} /></td>
+              <td><input type="text" name="description" onChange={handleInput} /></td>
               <td></td>
               <td>
                 <button onClick={(event) => handleAddCancel(event)}>キャンセル</button>
@@ -84,9 +113,9 @@ export default function Page() {
             editingRow === data.id ? (
               <tr key={data.id}>
                 <td>{data.id}</td>
-                <td><input type="text" defaultValue={data.name} /></td>
-                <td><input type="number" defaultValue={data.price} /></td>
-                <td><input type="text" defaultValue={data.description} /></td>
+                <td><input type="text" value={input.name} name="name" onChange={handleInput} /></td>
+                <td><input type="number" value={input.price} name="price" onChange={handleInput} /></td>
+                <td><input type="text" value={input.description} name="description" onChange={handleInput} /></td>
                 <td></td>
                 <td>
                   <button onClick={() => handleEditCancel(data.id)}>キャンセル</button>
