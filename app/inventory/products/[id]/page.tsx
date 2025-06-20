@@ -1,5 +1,6 @@
 'use client'
 
+import { useParams } from "next/navigation"
 import { useState, useEffect } from 'react';
 import productsData from "../sample/dummy_products.json";
 import inventoriesData from "../sample/dummy_inventories.json";
@@ -21,9 +22,14 @@ type InventoryData = {
   inventory: number;
 };
 
-export default function Page({ params }) : {
-  params: { id: number },
-} {
+export default function Page() {
+  const params = useParams();
+
+  if (!params || !params.id){
+    return <div>パラメータが見つかりません</div>
+  }
+  const id = Number(params.id);
+
   // 読込データを保持
   const [product, setProduct] = useState<ProductData>
   ({ id: 0, name: "", price: 0, description: ""});
@@ -31,7 +37,7 @@ export default function Page({ params }) : {
   const [data, setData] = useState<Array<InventoryData>>([]);
 
   useEffect (() => {
-    const selectedProduct: ProductData = productsData.find(v => v.id == params.id)?? {
+    const selectedProduct: ProductData = productsData.find(v => v.id === id)?? {
       id: 0,
       name: "",
       price: 0,
@@ -39,7 +45,7 @@ export default function Page({ params }) : {
     };
     setProduct(selectedProduct);
     setData(inventoriesData);
-  }, [])
+  }, [id])
 
   return (
     <>
@@ -70,14 +76,14 @@ export default function Page({ params }) : {
           </tr>
         </thead>
         <tbody>
-          {data.map((data: InventoryData) => (
-            <tr key={data.id}>
-              <td>{data.type}</td>
-              <td>{data.date}</td>
-              <td>{data.unit}</td>
-              <td>{data.quantity}</td>
-              <td>{data.price}</td>
-              <td>{data. inventory}</td>
+          {data.map((d: InventoryData) => (
+            <tr key={d.id}>
+              <td>{d.type}</td>
+              <td>{d.date}</td>
+              <td>{d.unit}</td>
+              <td>{d.quantity}</td>
+              <td>{d.price}</td>
+              <td>{d.inventory}</td>
             </tr>
           ))}
         </tbody>
