@@ -1,15 +1,22 @@
 'use client'
 
 import { useParams } from "next/navigation"
+import { useForm } from "react-hook-form"
 import { useState, useEffect } from 'react';
 import productsData from "../sample/dummy_products.json";
 import inventoriesData from "../sample/dummy_inventories.json";
+import { resourceLimits } from "worker_threads";
 
 type ProductData = {
   id: number;
   name: string;
   price: number;
   description: string;
+};
+
+type FormData = {
+    id: number;
+    quantity: number;
 };
 
 type InventoryData = {
@@ -30,11 +37,29 @@ export default function Page() {
   }
   const id = Number(params.id);
 
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
+
   // 読込データを保持
   const [product, setProduct] = useState<ProductData>
   ({ id: 0, name: "", price: 0, description: ""});
 
   const [data, setData] = useState<Array<InventoryData>>([]);
+
+  // submit時のactionを分岐させる
+  const [action, setAction] = useState<string>("");
+  const [open, setOpen] = useState(false);
+  //const [severity, setSeverity] = useState<AlertColor>('success');
+  const [message, setMessage] = useState('');
+  //const result = (severity: AlertColor, message: string) => {
+  const result = (message: string) => {
+    setOpen(true);
+    //setSeverity(severity);
+    setMessage(message);
+  }
 
   useEffect (() => {
     const selectedProduct: ProductData = productsData.find(v => v.id === id)?? {
@@ -46,6 +71,32 @@ export default function Page() {
     setProduct(selectedProduct);
     setData(inventoriesData);
   }, [id])
+
+  const onSubmit = (event: any): void => {
+    const data: FormData = {
+      id: Number(params.id),
+      quantity: Number(event.quantity),
+    };
+
+    // actionによってHTTPメソッドと使用するパラメーターを切り替える
+    if (action === "purchase") {
+      handlePurchase(data);
+    } else if (action === "sell"){
+      if (data.id === null) {
+        return;
+      }
+      handleSell(data);
+    }
+  };
+
+  // 仕入れ・卸し処理
+  const handlePurchase = (data: FormData) => {
+    result('success', '商品を仕入れました')
+  }
+
+  const handleSell = (data: FormData) => {
+    result('success', '商品を卸しました')
+  }
 
   return (
     <>
