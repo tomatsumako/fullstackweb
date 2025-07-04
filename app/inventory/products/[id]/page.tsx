@@ -16,6 +16,8 @@ import {
     TextField,
     Typography,
 } from "@mui/material";
+
+import { useParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { useState, useEffect } from 'react';
 import productsData from "../sample/dummy_products.json";
@@ -43,9 +45,13 @@ type InventoryData = {
     inventory: number;
 };
 
-export default function PagePage({ params }: {
-    params: { id: number },
-}) {
+export default function PagePage() {
+    const params = useParams();
+
+    if (!params || !params.id){
+        return <div>パラメータが見つかりません</div>
+    }
+    const id = Number(params.id);
 
     const {
         register,
@@ -70,8 +76,9 @@ export default function PagePage({ params }: {
     const handleClose = (event: any, reason: any) => {
         setOpen(false);
     };
+
     useEffect(() => {
-        const selectedProduct: ProductData = productsData.find(v => v.id == params.id) ?? {
+        const selectedProduct: ProductData = productsData.find(v => v.id === id) ?? {
             id: 0,
             name: "",
             price: 0,
@@ -79,7 +86,7 @@ export default function PagePage({ params }: {
           };
         setProduct(selectedProduct);
         setData(inventoriesData);
-    }, [open])
+    }, [id])
 
     const onSubmit = (event: any): void => {
         const data: FormData = {
