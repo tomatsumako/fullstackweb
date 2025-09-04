@@ -1,11 +1,13 @@
 'use client'
 
+import axios from 'axios'
 import {
     Alert,
     AlertColor,
     Box,
     Button,
     Paper,
+    responsiveFontSizes,
     Snackbar,
     Table,
     TableBody,
@@ -78,15 +80,33 @@ export default function PagePage() {
     };
 
     useEffect(() => {
-        const selectedProduct: ProductData = productsData.find(v => v.id === id) ?? {
-            id: 0,
-            name: "",
-            price: 0,
-            description: "",
-          };
-        setProduct(selectedProduct);
-        setData(inventoriesData);
-    }, [id])
+        axios.get(`/api/inventory/products/${params.id}`)
+            .then((response) => {
+                setProduct(response.data);
+            });
+        axios.get(`/api/inventory/inventories/${params.id}`)
+            .then((response) => {
+                const inventoryData: InventoryData[] = [];
+                let key: number = 1;
+                let inventory: number = 0;
+
+                response.data.forEach((e: InventoryData) => {
+                    // 売るときは在庫数から引く
+                    inventory += e.type === 1 ? e.quantity : e.quantity * -1;
+                    const newElement = {
+                        id: key++,
+                        type: e.type,
+                        date: e.date,
+                        unit: e.unit,
+                        quantity: e.quantity,
+                        price: e.unit * e.quantity,
+                        inventory: inventory,
+                    };
+                    inventoryData.unshift(newElement);
+                });
+                setData(inventoryData);
+            });
+    }, [open])
 
     const onSubmit = (event: any): void => {
         const data: FormData = {
