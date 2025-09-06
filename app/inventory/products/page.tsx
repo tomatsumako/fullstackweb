@@ -84,11 +84,11 @@ export default function Page() {
             handleAdd(data);
         } else if (action === "update") {
             if (data.id === null) {
-            return;
+                return;
             }
             handleEdit(data);
-            } else if (action === "delete") {
-                if (data.id === null) {
+        } else if (action === "delete") {
+            if (data.id === null) {
                 return;
             }
             handleDelete(data.id);
