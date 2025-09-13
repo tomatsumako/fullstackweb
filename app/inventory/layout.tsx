@@ -1,4 +1,5 @@
 "use client";
+import axios from '../../plugins/axios';
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -59,7 +60,11 @@ export default function InventoryLayout({
 
     // ログアウト処理
     const handleLogout = () => {
-        router.replace("/login");
+        axios
+            .post("/api/inventory/logout")
+            .then((response) => {
+                router.push("/login");
+            });
     };
 
     /** 開閉対象となるサイドバー本体 */
